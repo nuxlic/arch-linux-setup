@@ -1,27 +1,30 @@
 #!/bin/sh
-echo "Bienvenido al Instalador de arch-linux"
+echo $'\n'"Bienvenido al Instalador de arch-linux"
 echo "--------------------------------------"
 echo "Elija una opcion:"
 echo "   1.Instalar sistema base"
 echo "   2.Post-Instalacion"
 read resp
 echo "Se conecta a internet por wifi? y/n"
+read red
+iwconfig
+echo "Ingrese el nombre de su interfaz de red:"
+read interface
+if [ $red = "y" ]
+then
+	ip link set $interface up
+	mv /etc/wpa_supplicant/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf.orig
+	echo "Ingrese nombre de la red"
 	read red
-	if [ $red = "y" ]
-	then
-		ip link set wlan0 up
-		mv /etc/wpa_supplicant/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf.orig
-		echo "Ingrese nombre de la red"
-		read red
-		echo "Ingrese clave"
-		read clave
-		wpa_passphrase $red ""${clave}"" > /etc/wpa_supplicant/wpa_supplicant.conf
-		wpa_supplicant -B -Dwext -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
-		dhcpcd wlan0
-	else
-		ip link set eth0 up
-		dhcpcd eth0
-	fi
+	echo "Ingrese clave"
+	read clave
+	wpa_passphrase $red ""${clave}"" > /etc/wpa_supplicant/wpa_supplicant.conf
+	wpa_supplicant -B -Dwext -i $interface -c /etc/wpa_supplicant/wpa_supplicant.conf
+	dhcpcd $interface
+else
+		ip link set $interface up
+		dhcpcd $interface
+fi
 if [ $resp = "1" ] 
 then
 	loadkeys es
@@ -123,9 +126,7 @@ then
 	echo "Establesca la contraseña del root"
 	arch-chroot /mnt passwd
 	umount /mnt/{boot,home,}
-	echo "IMPORTANTE: Se va a reiniciar el sistema, RECUERDE volver a ejecutar el script"
-	echo " asi se continua con la post-instalacion"
-	echo "SI NO SE REINICIA APRETE CTL+ALT+SUPR"
+	echo "IMPORTANTE: Se va a reiniciar el sistema, RECUERDE volver a ejecutar el script"$'\n'"asi se continua con la post-instalacion"$'\n'"SI NO SE REINICIA APRETE CTL+ALT+SUPR"
 	echo "Presione una tecla para reiniciar"
 	read r
 	reboot
@@ -133,23 +134,65 @@ then
 elif [ $resp = "2" ]
 then
 	echo "Post-Instalacion"
+	
+	echo "Actualizando el sistema"$'\n'
+	echo "Su sistema es de 64 bits? y/n"
+	read archi
+	if [ $archi = "y" ]
+	then
+		echo "Desea agregar el repositorio Multilib? y/n"
+		read multi
+		if [ $multi = "y" ]
+		then
+			echo "[multilib]" $'\n'"SigLevel = PackageRequired" $'\n'"Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+		fi
+	fi
+	pacman -Syu
+	
 	echo "Creacion de usuario:"
+	echo "Desea crear un usuario? y/n"
+	read usr
+	if [ $usr = "y" ]
+	then
 	echo "Ingrese nombre de usuario"
 	read nombre
 	useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $nombre
 	echo "Ingrese password"
 	passwd $nombre	
-
-	echo "Actualizando el sistema"	
-	pacman -Syu
+	fi
+	
 	
 	#Le falta sopa a partir de aca
-	pacman -Syu gnome gnome-extra
-	echo "Presione tecla para reiniciar"
+	
+	
+	pacman -Sy pulseaudio-alsa alsa-plugins alsa-utils 
+	
+	pacman -Sy xorg-server xorg-xinit xorg-server-utils xf86-input-evdev xorg-twm xorg-xclock xterm ttf-dejavu dbus
+	
+	pacman -Sy mesa mesa-demos 
+	
+	echo "Tu placa de video es Nvidia? y/n"
+	read video
+	if [ $video = "y" ]
+	then
+		pacman -Sy nvidia 
+	fi
+	if [ $archi = "y" ]
+	then
+		pacman -Sy lib32-nvidia-utils lib32-alsa-plugins
+	fi
+	
+	echo "Deseas instalar gnome como tu entorno grafico? y/n"
+	read graf
+	if [ $graf = "y" ]
+	then
+		pacman -Sy gnome gnome-extra
+	fi
+	echo "Post-Instalacion terminada"$'\n'"Presione tecla para reiniciar"
 	read t	
 	reboot
 fi
-
+#Le mando frula a las opciones y no entro por ninguna
 echo "Ingreso una opcion no valida"
 
 
