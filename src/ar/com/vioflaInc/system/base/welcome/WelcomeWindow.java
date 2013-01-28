@@ -19,7 +19,7 @@ import java.awt.event.ActionEvent;
 public class WelcomeWindow extends JFrame {
 	public WelcomeWindow() {
 		setTitle("Viofla Inc.");
-		setIconImage(Toolkit.getDefaultToolkit().getImage("/home/viofla/arch-linux-setup/Resources/Arhc_logo.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(WelcomeWindow.class.getResource("/ar/com/vioflaInc/resources/Arhc_logo.png")));
 		getContentPane().setLayout(null);
 		
 		JLabel lblBienvenidoAlAsistente = new JLabel("Bienvenido al Asistente de Instalación de Arch Linux");
@@ -50,7 +50,7 @@ public class WelcomeWindow extends JFrame {
 		getContentPane().add(btnSalir);
 		
 		JLabel label = new JLabel("");
-		label.setIcon(new ImageIcon("/home/viofla/arch-linux-setup/Resources/Arhc_logo.png"));
+		label.setIcon(new ImageIcon(WelcomeWindow.class.getResource("/ar/com/vioflaInc/resources/Arhc_logo.png")));
 		label.setBounds(344, 52, 388, 290);
 		getContentPane().add(label);
 		
