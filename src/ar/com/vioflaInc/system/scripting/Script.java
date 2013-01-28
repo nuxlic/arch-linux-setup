@@ -2,6 +2,7 @@ package ar.com.vioflaInc.system.scripting;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class Script {
 
@@ -49,7 +50,7 @@ public class Script {
 	 * @throws Exception
 	 *             excepcion levantada en caso de error
 	 */
-	public String executeCommand() throws Exception {
+	public String executeCommand() {
 		output = null;
 		error = null;
 		StreamGobbler errorGobbler = null;
@@ -75,9 +76,9 @@ public class Script {
 					null, this.verbose);
 			// StreamGobbler(proc.getInputStream(), "OUTPUT", fos);
 			// kick them off
-//			errorGobbler.start();
+			// errorGobbler.start();
 			errorGobbler.run();
-//			outputGobbler.start();
+			// outputGobbler.start();
 			outputGobbler.run();
 			// any error???
 			@SuppressWarnings("unused")
@@ -131,8 +132,7 @@ public class Script {
 	 * @throws Exception
 	 *             Excepcion levantada en caso de error
 	 */
-	public String executeScript(String content, String pathname, boolean delete)
-			throws Exception {
+	public String executeScript(String content, String pathname, boolean delete) {
 		File f = null;
 		FileOutputStream fout = null;
 		try {
@@ -159,7 +159,7 @@ public class Script {
 			String error = permisos.getError();
 			if (error != null) {
 				if (error.length() > 0)
-					throw new Exception("Permission denied : " + error);
+					throw new RuntimeException("Permission denied : " + error);
 			}
 			traza("executeScript", "Permisos asignados");
 			// ejecutar fichero .sh
@@ -180,8 +180,10 @@ public class Script {
 				traza("executeScript", "fichero eliminado");
 			}
 			return result;
-		} catch (Exception e) {
-			throw e;
+		} catch (RuntimeException | IOException e) {
+			
+				throw new RuntimeException();
+			
 		}
 	}
 
