@@ -67,7 +67,7 @@ public class ConnectionApplication {
 			conn.executeScript(content, null, true);
 			
 		} else {
-			if(red==""||red==null||pass==""||pass==null){
+			if(red.equals("")||red==null||pass.equals("")||pass==null){
 				throw new RuntimeException("No se pudo Conectar: Red o Clave no completada");
 			}
 			
