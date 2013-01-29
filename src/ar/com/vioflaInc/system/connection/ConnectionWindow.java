@@ -5,23 +5,24 @@ import java.awt.Rectangle;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import javax.swing.JCheckBox;
 
 
 @SuppressWarnings("serial")
 public class ConnectionWindow extends JFrame implements ItemListener {
-	private JTextField textField=new JTextField();
 	private JPasswordField passwordField=new JPasswordField();;
 	private ConnectionApplication connApp=ConnectionApplication.INSTANCE();
 	final JComboBox<String> comboBox = new JComboBox<String>();
-	final JLabel lblRedssid = new JLabel("Red (ssid)");
+	final JLabel lblRedssid = new JLabel("Red (essid)");
 	final JLabel lblPassword = new JLabel("Password");
+	final JComboBox<String> comboBox_1 = new JComboBox<String>();
+	JLabel lblDebeEstarConfigurada = new JLabel("Debe estar configurada con seguridad WPA");
 	public ConnectionWindow() {
 		setTitle("Viofla Inc.");
 		setBounds(new Rectangle(0, 27, 754, 495));
@@ -42,7 +43,7 @@ public class ConnectionWindow extends JFrame implements ItemListener {
 		getContentPane().add(lblInterfaz);
 		
 		comboBox.addItemListener(this);
-		comboBox.setBounds(124, 175, 114, 20);
+		comboBox.setBounds(124, 175, 155, 20);
 		for(String interfaz: connApp.getInterfaces()){
 			comboBox.addItem(interfaz);
 		}
@@ -51,24 +52,19 @@ public class ConnectionWindow extends JFrame implements ItemListener {
 		
 		
 		lblRedssid.setVisible(false);
-		lblRedssid.setBounds(33, 227, 94, 15);
+		lblRedssid.setBounds(33, 276, 94, 15);
 		getContentPane().add(lblRedssid);
 		
 		
-		textField.setVisible(false);
-		textField.setText("");
-		textField.setBounds(124, 225, 114, 19);
-		getContentPane().add(textField);
-		
-		
 		lblPassword.setVisible(false);
-		lblPassword.setBounds(33, 254, 84, 15);
+		lblPassword.setBounds(33, 303, 84, 15);
 		getContentPane().add(lblPassword);
 		
 		
 		passwordField.setVisible(false);
 		passwordField.setText("");
-		passwordField.setBounds(124, 252, 114, 19);
+		
+		passwordField.setBounds(124, 301, 155, 19);
 		getContentPane().add(passwordField);
 		
 		JButton btnSalir = new JButton("Salir");
@@ -91,7 +87,7 @@ public class ConnectionWindow extends JFrame implements ItemListener {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					
-					connApp.connect(comboBox.getSelectedItem().toString(), textField.getText(), passwordField.getPassword().toString(), btnSiguiente);
+					connApp.connect(comboBox.getSelectedItem().toString(), comboBox_1.getSelectedItem().toString(), passwordField.getPassword().toString(), btnSiguiente);
 					
 				} catch (RuntimeException e) {
 					label.setText(e.getMessage());
@@ -103,6 +99,29 @@ public class ConnectionWindow extends JFrame implements ItemListener {
 		
 		label.setBounds(22, 90, 718, 49);
 		getContentPane().add(label);
+		
+		final JCheckBox chckbxYaEstoyConectado = new JCheckBox("Ya estoy conectado a Internet y me quiero saltar este paso");
+		chckbxYaEstoyConectado.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(chckbxYaEstoyConectado.isSelected()){
+					btnSiguiente.setEnabled(true);
+				}
+			}
+		});
+		chckbxYaEstoyConectado.setBounds(23, 377, 458, 23);
+		getContentPane().add(chckbxYaEstoyConectado);
+		
+		comboBox_1.setVisible(false);
+		comboBox_1.setBounds(124, 271, 155, 24);
+		for(String red: connApp.getEssid()){
+			comboBox_1.addItem(red);
+		}
+		getContentPane().add(comboBox_1);
+		
+		lblDebeEstarConfigurada.setVisible(false);
+		lblDebeEstarConfigurada.setBounds(33, 227, 326, 15);
+		getContentPane().add(lblDebeEstarConfigurada);
+		
 	}
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -110,7 +129,8 @@ public class ConnectionWindow extends JFrame implements ItemListener {
 			lblRedssid.setVisible(true);
 			lblPassword.setVisible(true);
 			passwordField.setVisible(true);
-			textField.setVisible(true);
+			comboBox_1.setVisible(true);
+			lblDebeEstarConfigurada.setVisible(true);
 
 			
 		}else{
@@ -118,7 +138,9 @@ public class ConnectionWindow extends JFrame implements ItemListener {
 			lblRedssid.setVisible(false);
 			lblPassword.setVisible(false);
 			passwordField.setVisible(false);
-			textField.setVisible(false);
+			comboBox_1.setVisible(false);
+			lblDebeEstarConfigurada.setVisible(false);
+
 		}
 	}
 }

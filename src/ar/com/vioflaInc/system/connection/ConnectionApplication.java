@@ -56,6 +56,8 @@ public class ConnectionApplication {
 		conn.executeScript(content, null, true);
 		if (!conn.getError().contains("no wireless extensions")) {
 			this.setWifi(true);
+		}else{
+			this.setWifi(false);
 		}
 		return this.getWifi();
 	}
@@ -90,6 +92,34 @@ public class ConnectionApplication {
 		}else{
 			sig.setEnabled(true);
 		}
+	}
+	
+	public Collection<String> getEssid() {
+		Script conn = new Script();
+		String content = "iwlist scan";
+		String output = conn.executeScript(content, null, true);
+		Collection<String> toRet;
+		toRet = this.getNombresEssid(output);
+		return toRet;
+
+	}
+	
+	private Collection<String> getNombresEssid(String o){
+		String[] col = o.split("ESSID:");
+		Collection<String> toRet = new ArrayList<String>();
+		for (int i = 1; i < col.length; i++) {
+			int cont=1;
+			for (int j = 1; j < col[i].toCharArray().length; j++) {
+				if(col[i].toCharArray()[j]=='"'){
+					break;
+				}else{
+					cont++;
+				}
+				
+			}
+			toRet.add(col[i].substring(1, cont));
+		}
+		return toRet;
 	}
 
 }
