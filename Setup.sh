@@ -92,32 +92,15 @@ then
 	arch-chroot /mnt echo "localhost" > /etc/hostname
 	arch-chroot /mnt ln -s /usr/share/zoneinfo/America/Buenos_Aires /etc/localtime
 	
-	echo "Usted se encuentra en Argentina? y/n"
-	read p
-	if [ $p = "y" ]
-	then
-		echo "LANG=es_AR.UTF-8" > /mnt/etc/locale.conf
-		echo "es_AR.UTF-8 UTF-8" >> /mnt/etc/locale.gen
-		echo "es_AR ISO-8859-1" >> /mnt/etc/locale.gen
-		echo "KEYMAP=es" > /mnt/etc/vconsole.conf
+	
+	echo "LANG=es_AR.UTF-8" > /mnt/etc/locale.conf
+	echo "es_AR.UTF-8 UTF-8" >> /mnt/etc/locale.gen
+	echo "es_AR ISO-8859-1" >> /mnt/etc/locale.gen
+	echo "KEYMAP=es" > /mnt/etc/vconsole.conf
 
-	else
-		echo "Elija su preferencia de localizacion editando la linea LANG. En argentina: es_AR.UTF-8"
-		arch-chroot /mnt nano /etc/locale.conf
-		echo "Configurar localizacion: elimine el # al inicio de la linea de tu localizacion. En argentina: es_AR.UTF-8"
-		echo "Presione una tecla para editar"
-		read p
-		arch-chroot /mnt nano /etc/locale.gen
-	fi
+	
 	arch-chroot /mnt locale-gen
-	echo "Configurar el teclado"
-	echo "Usted quiere el teclado en español? y/n"
-	echo "Si elige que no, debera configurarlo manualmente poniendo KEYMAP=idioma"
-	read p
-	if [ $p = "n" ]
-	then
-		arch-chroot /mnt nano /etc/vconsole.conf
-	fi
+	
 	
 	arch-chroot /mnt grub-install /dev/"${disco}"
 	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
@@ -133,64 +116,89 @@ then
 	
 elif [ $resp = "2" ]
 then
-	echo "Post-Instalacion"
+		echo "Post-Instalacion"
 	
-	echo "Actualizando el sistema"$'\n'
-	echo "Su sistema es de 64 bits? y/n"
-	read archi
-	if [ $archi = "y" ]
-	then
-		echo "Desea agregar el repositorio Multilib? y/n"
-		read multi
-		if [ $multi = "y" ]
+		echo "Actualizando el sistema"$'\n'
+		
+		echo "Su sistema es de 64 bits? y/n"
+		read archi
+		if [ $archi = "y" ]
 		then
-			echo "[multilib]" $'\n'"SigLevel = PackageRequired" $'\n'"Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+			echo "Desea agregar el repositorio Multilib? y/n"
+			read multi
+			if [ $multi = "y" ]
+			then
+				echo "[multilib]" $'\n'"SigLevel = PackageRequired" $'\n'"Include = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+			fi
 		fi
-	fi
-	pacman -Syu
-	
-	echo "Creacion de usuario:"
-	echo "Desea crear un usuario? y/n"
-	read usr
-	if [ $usr = "y" ]
-	then
-	echo "Ingrese nombre de usuario"
-	read nombre
-	useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $nombre
-	echo "Ingrese password"
-	passwd $nombre	
-	fi
-	
-	
-	#Le falta sopa a partir de aca
-	
-	
-	pacman -Sy pulseaudio-alsa alsa-plugins alsa-utils 
-	
-	pacman -Sy xorg-server xorg-xinit xorg-server-utils xf86-input-evdev xorg-twm xorg-xclock xterm ttf-dejavu dbus
-	
-	pacman -Sy mesa mesa-demos 
-	
-	echo "Tu placa de video es Nvidia? y/n"
-	read video
-	if [ $video = "y" ]
-	then
-		pacman -Sy nvidia 
-	fi
-	if [ $archi = "y" ]
-	then
-		pacman -Sy lib32-nvidia-utils lib32-alsa-plugins
-	fi
-	
-	echo "Deseas instalar gnome como tu entorno grafico? y/n"
-	read graf
-	if [ $graf = "y" ]
-	then
-		pacman -Sy gnome gnome-extra
-	fi
-	echo "Post-Instalacion terminada"$'\n'"Presione tecla para reiniciar"
-	read t	
-	reboot
+		pacman -Syu
+
+		echo "Creacion de usuario:"
+		echo "Desea crear un usuario? y/n"
+		read usr
+		if [ $usr = "y" ]
+		then
+			echo "Ingrese nombre de usuario"
+			read nombre
+			useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $nombre
+			echo "Ingrese password"
+			passwd $nombre	
+		fi
+
+
+		#Le falta sopa a partir de aca
+
+
+		pacman -Sy pulseaudio-alsa alsa-plugins alsa-utils
+
+		pacman -Sy xorg-server xorg-xinit xorg-server-utils xf86-input-evdev xorg-twm xorg-xclock xterm ttf-dejavu dbus xorg
+
+		pacman -Sy mesa mesa-demos
+
+		echo "Tu placa de video es Nvidia? y/n"
+		read video
+		if [ $video = "y" ]
+		then
+			pacman -Sy nvidia
+		fi
+		if [ $archi = "y" ]
+		then
+			pacman -Sy lib32-nvidia-utils lib32-alsa-plugins
+		fi
+		echo "Deseas instalar gnome como tu entorno grafico? y/n"
+		read graf
+		if [ $graf = "y" ]
+		then
+			pacman -Sy gnome firefox
+			systemctl enable gdm.service
+			systemctl enable NetworkManager.service
+		fi
+		echo "Deseas instalar los extras de gnome? y/n"
+		read grafe
+		if [ $grafe = "y" ]
+		then
+			pacman -Sy gnome-extra
+		fi
+		echo "Deseas instalar libreoffice? y/n"
+		read libreof
+		if [ $libreof = "y" ]
+		then
+			pacman -Sy libreoffice
+		fi
+		echo "Deseas instalar el gestor de paquetes yaourt? y/n"
+		read yao
+		if [ $yao = "y" ]
+		then
+			echo "[archlinuxfr]" $'\n'"Server = http://repo.archlinux.fr/$arch" >> /etc/pacman.conf
+			pacman -Sy yaourt
+			echo "Debe comentar las lineas del repositorio archlinuxfr para desactivarlo, es muy importante que lo haga"
+			echo "Presione una tecla para continuar"
+			read tecla
+			nano /etc/pacman.conf
+		fi
+		echo "Post-Instalacion terminada"$'\n'"Presione tecla para reiniciar"
+		read t
+		reboot
 fi
 #Le mando frula a las opciones y no entro por ninguna
 echo "Ingreso una opcion no valida"
