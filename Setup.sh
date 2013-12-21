@@ -88,7 +88,7 @@ then
 	
 	echo "GRUB_DISABLE_SUBMENU=y" >> /mnt/etc/default/grub
 	
-	pacstrap /mnt wireless_tools wpa_supplicant wpa_actiond ifplugd
+	pacstrap /mnt wireless_tools wpa_supplicant wpa_actiond ifplugd net-tools
 	genfstab -U /mnt >> /mnt/etc/fstab
 	
 	echo "Configurando el sistema"
