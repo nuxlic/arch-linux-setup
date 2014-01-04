@@ -44,7 +44,6 @@ then
 	echo "   ¡Este procedimiento elimina todo el contenido previo del disco duro!"
 	echo "e. Para salir de cfdisk, elegir Quit."
 	echo "IMPORTANTE: Usar este orden de particiones y recordas en que device particiono (ej: /dev/sda)"
-	echo "Para mas informacion leer ./Guias/Particionar.txt"
 	echo "Presione tecla para continuar .."
 	read tecla
 	cfdisk
@@ -192,7 +191,7 @@ then
 		read yao
 		if [ $yao = "y" ]
 		then
-			echo "[archlinuxfr]" $'\n'"Server = http://repo.archlinux.fr/$arch"$'\n'"SigLevel = Optional TrustAll" >> /etc/pacman.conf
+			echo "[archlinuxfr]" $'\n'"Server = http://repo.archlinux.fr/\$arch"$'\n'"SigLevel = Optional TrustAll" >> /etc/pacman.conf
 			pacman -Sy yaourt
 			echo "Debe comentar las lineas del repositorio archlinuxfr para desactivarlo, es muy importante que lo haga"
 			echo "Presione una tecla para continuar"
